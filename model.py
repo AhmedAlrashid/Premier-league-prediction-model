@@ -29,7 +29,27 @@ def dataset_to_database(file_path, encoding = 'utf-8'):
 
 def reading_file(file_path):
     df=pd.read_csv(file_path)
+    df.dtypes
     print(df.tail())
 
+def catgeorize_for_ml(file_path):
+    matches=pd.read_csv(file_path)
+    #add venue codes to numerically measure venue (home and away)
+    matches["venue_code"]=matches["venue"].astype("category").cat.codes
+    #add opponent codes to numerically measure opponent
+    matches["opp_code"]=matches["opponent"].astype("category").cat.codes
+    #numerify time
+    matches["hours"]=matches["time"].str.replace(":.+","",regex=True)
+    # What day of the week
+    matches["date"] = pd.to_datetime(matches["date"])
+    matches["day_code"] = matches["date"].dt.dayofweek
+    #checks if team won, 1 if they won, 0 if they lost
+    matches["target"]=(matches["result"]=="W").astype("int")
 
-reading_file('results.csv')
+    return matches
+
+
+
+matches_new=catgeorize_for_ml('matches.csv')
+print(matches_new.head())
+reading_file('matches.csv')
