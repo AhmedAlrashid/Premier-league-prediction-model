@@ -1,6 +1,7 @@
 import csv
 import sqlite3
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 
 def dataset_to_database(file_path, encoding = 'utf-8'):
     with open(file_path, 'r', encoding = encoding) as the_file:
@@ -47,6 +48,14 @@ def catgeorize_for_ml(file_path):
     matches["target"]=(matches["result"]=="W").astype("int")
 
     return matches
+
+def training(file_path):
+    matches=pd.read_csv(file_path)
+    rf=RandomForestClassifier(n_estimators=50,min_samples_split=10,random_state=1)
+    train_set=matches["date"]<"2022-01-01"
+    test_set=matches["date"]>="2022-01-01"
+    predictors=["venue_code","opp_code","hours","day_code"]
+    rf.fit(train_set["predictors"],train_set["target"])
 
 
 
